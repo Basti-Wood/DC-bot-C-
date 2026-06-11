@@ -1,0 +1,15 @@
+# Secrets
+.env
+
+# Database data (docker volume mount)
+data/
+
+# .NET build output
+bin/
+obj/
+*.user
+
+# IDE
+.vs/
+.vscode/
+.idea/

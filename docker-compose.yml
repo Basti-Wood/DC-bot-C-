@@ -1,0 +1,71 @@
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: dcbot-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+      MARIADB_DATABASE: ${DB_NAME:-dcbot}
+      MARIADB_USER: ${DB_USER:-dcbot}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - ./data/mariadb:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ---------------------------------------------------------------
+  # Bot instance 1 — the "main" bot.
+  # Every bot service uses the SAME image; only BOT_ID and
+  # DISCORD_TOKEN differ. BOT_ID separates all SQL entries.
+  # ---------------------------------------------------------------
+  bot-main:
+    build:
+      context: .
+      target: bot
+    image: dcbot:latest
+    container_name: dcbot-main
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      BOT_ID: main
+      DISCORD_TOKEN: ${DISCORD_TOKEN_MAIN:?set DISCORD_TOKEN_MAIN in .env}
+      GUILD_ID: ${GUILD_ID_MAIN:-}
+      LOG_DEBUG: ${LOG_DEBUG:-false}
+      GPT_TOKEN: ${GPT_TOKEN:-}
+      BASTIAPI: ${BASTIAPI:-}
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-dcbot}
+      DB_USER: ${DB_USER:-dcbot}
+      DB_PASSWORD: ${DB_PASSWORD}
+
+  # ---------------------------------------------------------------
+  # Bot instance 2 — optional second bot from the same code.
+  # Start it with:  docker compose --profile second up -d
+  # Copy this block (new BOT_ID + token) for a third bot, etc.
+  # ---------------------------------------------------------------
+  bot-second:
+    image: dcbot:latest
+    container_name: dcbot-second
+    restart: unless-stopped
+    profiles: ["second"]
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      BOT_ID: second
+      DISCORD_TOKEN: ${DISCORD_TOKEN_SECOND:-}
+      GUILD_ID: ${GUILD_ID_SECOND:-}
+      LOG_DEBUG: ${LOG_DEBUG:-false}
+      GPT_TOKEN: ${GPT_TOKEN:-}
+      BASTIAPI: ${BASTIAPI:-}
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-dcbot}
+      DB_USER: ${DB_USER:-dcbot}
+      DB_PASSWORD: ${DB_PASSWORD}

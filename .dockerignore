@@ -1,0 +1,17 @@
+# Secrets & local data
+.env
+data/
+
+# Build output
+**/bin/
+**/obj/
+
+# Git & IDE
+.git/
+.gitignore
+.vs/
+.vscode/
+.idea/
+
+# Docs
+README.md
