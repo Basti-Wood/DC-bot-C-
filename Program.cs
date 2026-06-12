@@ -3,6 +3,8 @@ using DCBot.Core;
 using DCBot.Core.Database;
 using DCBot.Events;
 using DCBot.Services.Ai;
+using DCBot.Services.Booster;
+using DCBot.Services.Flavor;
 using DCBot.Services.Level;
 using DCBot.Services.Roleplay;
 using Discord;
@@ -55,6 +57,8 @@ builder.Services.AddSingleton<EventManager>();
 
 // --- Shared services (Services/) — usable by commands and events ---
 builder.Services.AddSingleton<GuildConfigService>();
+builder.Services.AddSingleton<BoosterService>();
+builder.Services.AddSingleton<FlavorService>();
 builder.Services.AddSingleton<LevelRepository>();
 builder.Services.AddSingleton<RoleplayApi>();
 builder.Services.AddSingleton<AiService>();

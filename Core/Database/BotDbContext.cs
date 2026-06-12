@@ -9,6 +9,9 @@ public class BotDbContext : DbContext
 
     public DbSet<UserLevel> UserLevels => Set<UserLevel>();
     public DbSet<GuildConfig> GuildConfigs => Set<GuildConfig>();
+    public DbSet<RainbowUser> RainbowUsers => Set<RainbowUser>();
+    public DbSet<GalleryThread> GalleryThreads => Set<GalleryThread>();
+    public DbSet<GalleryPost> GalleryPosts => Set<GalleryPost>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,6 +26,25 @@ public class BotDbContext : DbContext
         {
             e.ToTable("guild_configs");
             e.HasIndex(x => new { x.BotId, x.GuildId, x.Key }).IsUnique();
+        });
+
+        modelBuilder.Entity<RainbowUser>(e =>
+        {
+            e.ToTable("rainbow_users");
+            e.HasIndex(x => new { x.BotId, x.GuildId, x.UserId }).IsUnique();
+            e.HasIndex(x => new { x.BotId, x.Active });
+        });
+
+        modelBuilder.Entity<GalleryThread>(e =>
+        {
+            e.ToTable("gallery_threads");
+            e.HasIndex(x => new { x.BotId, x.GuildId, x.UserId }).IsUnique();
+        });
+
+        modelBuilder.Entity<GalleryPost>(e =>
+        {
+            e.ToTable("gallery_posts");
+            e.HasIndex(x => new { x.BotId, x.GuildId, x.ChannelId, x.MessageId }).IsUnique();
         });
     }
 }
