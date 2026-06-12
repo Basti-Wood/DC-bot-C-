@@ -132,7 +132,7 @@ public sealed class BotService : BackgroundService
         _logger.LogInformation("Logged in as {User} ({Id})",
             _client.CurrentUser.Username, _client.CurrentUser.Id);
 
-        await _client.SetActivityAsync(new Game("tuubaa :3", ActivityType.Watching));
+        await _client.SetActivityAsync(new Game("Bastis neues Video :3", ActivityType.Watching));
         await _client.SetStatusAsync(UserStatus.Online);
 
         // Publish commands: to the configured guild, or to every guild the bot is in
