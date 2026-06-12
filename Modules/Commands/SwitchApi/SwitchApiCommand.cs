@@ -37,7 +37,7 @@ public sealed class SwitchApiCommand : ICommand
         if (!RoleplayApi.IsBastiAvailable() && choice != "Otaku")
         {
             _api.ApiType = GifApiType.Otaku;
-            await cmd.RespondAsync("Basti API is not available, defaulting to OtakuGIFs API.");
+            await cmd.RespondAsync("Basti API is not available, defaulting to OtakuGIFs API.", ephemeral: true);
             return;
         }
 
@@ -61,6 +61,6 @@ public sealed class SwitchApiCommand : ICommand
                 break;
         }
 
-        await cmd.RespondAsync(msg);
+        await cmd.RespondAsync(msg, ephemeral: true);
     }
 }

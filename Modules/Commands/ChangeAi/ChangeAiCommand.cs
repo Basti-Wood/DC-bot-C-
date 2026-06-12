@@ -43,7 +43,7 @@ public sealed class ChangeAiCommand : ICommand
                     return;
                 }
                 _ai.ActiveBackend = AiBackend.OpenAi;
-                await cmd.RespondAsync("AI-Backend: **OpenAI** ✅");
+                await cmd.RespondAsync("AI-Backend: **OpenAI** ✅", ephemeral: true);
                 break;
 
             case "basti":
@@ -54,12 +54,12 @@ public sealed class ChangeAiCommand : ICommand
                 }
                 _ai.ActiveBackend = AiBackend.Basti;
                 var hint = _ai.BastiLoaded ? "" : " (Modell noch nicht geladen — nutze `/loadai`)";
-                await cmd.RespondAsync($"AI-Backend: **Basti** ✅{hint}");
+                await cmd.RespondAsync($"AI-Backend: **Basti** ✅{hint}", ephemeral: true);
                 break;
 
             case "disabled":
                 _ai.ActiveBackend = AiBackend.Disabled;
-                await cmd.RespondAsync("AI ist jetzt **deaktiviert**.");
+                await cmd.RespondAsync("AI ist jetzt **deaktiviert**.", ephemeral: true);
                 break;
 
             default:
