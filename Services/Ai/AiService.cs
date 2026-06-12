@@ -167,8 +167,8 @@ public sealed class AiService
             ?? throw new InvalidOperationException("GPT_TOKEN environment variable not set");
 
         var messages = new List<ChatMessage> { new("system", Personality.SystemPrompt) };
-        foreach (var (role, content) in GetConversationHistory(channelId))
-            messages.Add(new ChatMessage(role, content));
+        foreach (var (role, histContent) in GetConversationHistory(channelId))
+            messages.Add(new ChatMessage(role, histContent));
         messages.Add(new ChatMessage("user", userPrompt));
 
         using var request = new HttpRequestMessage(HttpMethod.Post,
