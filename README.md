@@ -36,6 +36,7 @@ DC bot C#/
 │       ├── EventManager.cs     ← DER Event Manager
 │       ├── IEventListener.cs    Interface für Event-Listener
 │       ├── LevelXp/             XP für Nachrichten + Level-Up-Ankündigung
+│       ├── HeyLookListen/       "Hey"/"Look"/"Listen" bei Message-Burst
 │       └── AiChat/              AI antwortet bei @Mention oder Reply
 ├── Services/                 ── GETEILTE LOGIK ──
 │   ├── Level/                 XpMath, LevelRepository (SQL)
@@ -119,6 +120,7 @@ dotnet run
 | `/changeai` | Admin | AI-Backend: OpenAI / Basti / Disabled |
 | `/loadai`, `/unloadai` | Admin | Basti-Modell laden / entladen |
 | `/setprompt [prompt]` | Admin | System-Prompt fürs Basti-Backend |
+| `/setlistenwindow seconds` | Admin | Zeitfenster für HeyLookListen setzen (0–120 s) 0 = deaktiviert |
 
 **XP-System:** 15–25 XP pro Nachricht, max. 1× pro 60 s, Stunden-/Tageslimit.
 Kurve: `5·L² + 50·L + 100` XP pro Level, max. 1000. Level-Ups werden im
