@@ -5,43 +5,36 @@ public static class Rules
 {
     public static readonly IReadOnlyDictionary<string, string> Texts = new Dictionary<string, string>
     {
-        ["1"] = "**§1** Begegne allen Nutzern jederzeit freundlich und respektvoll.",
-        ["2"] = "**§2** Beachte die Nutzungsbedingungen (Terms of Service) von Discord.",
-        ["3"] = "**§3** Werbung für eigene oder fremde Inhalte ist nicht erlaubt.",
-        ["4"] = "**§4** Diskussionen über sensible Themen wie Politik oder Religion sind untersagt.",
-        ["5"] = "**§5** Beleidigungen, Provokationen sowie rassistische, sexistische oder radikale Aussagen werden nicht toleriert.",
-        ["6"] = "**§6** Namen, Profilbilder und Status dürfen keine Beleidigungen, Provokationen oder extremen Aussagen enthalten. Bei einem Hinweis durch das Team sind diese unverzüglich zu ändern.",
-        ["7"] = "**§7** Das Vortäuschen einer fremden Identität ist verboten.",
-        ["8"] = "**§8** Die Nutzung mehrerer Discord-Accounts ist untersagt.",
-        ["9"] = "**§9** Störungen in Sprachkanälen durch laute Geräusche, Stimmverzerrer, Soundboards o. Ä. sind verboten.",
-        ["10"] = "**§10** Das Teilen von NSFW-Inhalten oder ähnlichem ist strengstens untersagt.",
-        ["11"] = "**§11** Der Support darf nicht missbraucht werden. Wendet euch nur bei ernsthaften Anliegen an das Team.",
-        ["12"] = "**§12** Betteln oder Nachfragen nach Rängen ist nicht gestattet.",
-        ["13"] = "**§13** Den Anweisungen des Teams ist Folge zu leisten. In Zweifelsfällen hat das Team Entscheidungsrecht, auch über das Regelwerk hinaus.",
-        ["14"] = "**§14** Kein \"Backseat Arting\": Wenn jemand eine Zeichnung postet und nicht explizit um Feedback bittet, ist jegliche Form von Kritik zu unterlassen (z. B. „Ich hätte das anders gemacht.).",
-        ["15"] = "**§15** Dating, Flirten oder unangemessenes Verhalten sind auf dem Server nicht gestattet.",
-        ["16"] = "**§16** Bitte fragt **tuubaa** nicht, ob ich eure Freundschaftsanfragen annehmen euch in einem Video malen kann.",
+        ["1"] = "**§1** Bei unklarheiten im regelwerk müssen die Mods ausnahmsweise darüber entscheiden.",
+		["2"] = "**§2** Keine Beleidigungen und oder Radikale aussagen",
+		["3"] = "**§3** Keine rassistischen, sexistischen oder anderweitig diskriminierenden Inhalte.",
+		["4"] = "**§4** Werbung jeglicher form ist zu 99% untersagt. (es kann ausnahmen geben)",
+		["5"] = "**§5** das stören von VC gesprächen kann zu einer suspension von diesen führen, bis zum server bann.",
+		["6"] = "**§6** Material von <#1191008771955232919> dürft ihr überall benutzen, jedoch müsst ihr den personen dort Credit geben",
+		["7"] = "**§7** Haltet euch an discords TOS",
+		["8"] = "**§8** NSFW content ist nicht gestattet",
+		["9"] = "**§9** Haltet euch wenn möglich an die Geneva Suggestion",
+		["10"] = "**§10** Keine unnötigen pings",
+		["11"] = "**§11** Seid nett zueinander, auch wenn ihr anderer Meinung seid",
+		["12"] = "**§12** Bitte nicht nach FA fragen, die Antwort ist meistens Nein",
+
     };
 
     /// <summary>Choice-Labels für den /rule Command (gekürzt wie im Go-Bot).</summary>
     public static readonly (string Name, string Value)[] Choices =
     {
         ("§1 Begegne allen Nutzern jederzeit freundlich und respektvoll.", "1"),
-        ("§2 Beachte die Nutzungsbedingungen (Terms of Service) von Discord.", "2"),
-        ("§3 Werbung für eigene oder fremde Inhalte ist nicht erlaubt.", "3"),
-        ("§4 Diskussionen über sensible Themen wie Politik oder Religion sind untersagt.", "4"),
-        ("§5 Beleidigungen, Provokationen sowie rassistische, sexistische oder radikale...", "5"),
-        ("§6 Namen, Profilbilder und Status dürfen keine Beleidigungen, Provokationen...", "6"),
-        ("§7 Das Vortäuschen einer fremden Identität ist verboten.", "7"),
-        ("§8 Die Nutzung mehrerer Discord-Accounts ist untersagt.", "8"),
-        ("§9 Störungen in Sprachkanälen durch laute Geräusche, Stimmverzerrer...", "9"),
-        ("§10 Das Teilen von NSFW-Inhalten oder ähnlichem ist strengstens untersagt.", "10"),
-        ("§11 Der Support darf nicht missbraucht werden. Wendet euch nur bei...", "11"),
-        ("§12 Betteln oder Nachfragen nach Rängen ist nicht gestattet.", "12"),
-        ("§13 Den Anweisungen des Teams ist Folge zu leisten. In Zweifelsfällen hat...", "13"),
-        ("§14 Kein \"Backseat Arting\": Wenn jemand eine Zeichnung postet und nicht...", "14"),
-        ("§15 Dating, Flirten oder unangemessenes Verhalten sind auf dem Server nicht...", "15"),
-        ("§16 Bitte fragt tuubaa nicht, ob ich eure Freundschaftsanfragen...", "16"),
+		("§2 Keine Beleidigungen und/oder radikale Aussagen.", "2"),
+		("§3 Keine rassistischen, sexistischen oder anderweitig diskriminierenden Inhalte.", "3"),
+		("§4 Werbung jeglicher Form ist zu 99% untersagt. (Es kann Ausnahmen geben)", "4"),
+		("§5 Das Stören von VC-Gesprächen kann zu einer Suspension von diesen führen, bis zum Server-Bann.", "5"),
+		("§6 Material von <#1191008771955232919> dürft ihr überall benutzen, jedoch müsst ihr den Personen dort Credit geben.", "6"),
+		("§7 Haltet euch an Discords TOS.", "7"),
+		("§8 NSFW-Content ist nicht gestattet.", "8"),
+		("§9 Haltet euch wenn möglich an die Geneva Suggestion.", "9"),
+		("§10 Keine unnötigen Pings.", "10"),
+		("§11 Seid nett zueinander, auch wenn ihr anderer Meinung seid.", "11"),
+		("§12 Bitte nicht nach FA fragen, die Antwort ist meistens Nein.", "12"),
     };
 
     public static string DefaultRuleText()

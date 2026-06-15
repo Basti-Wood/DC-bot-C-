@@ -9,16 +9,16 @@ namespace DCBot.Events.LevelXp;
 
 /// <summary>
 /// Vergibt XP für Chat-Nachrichten (Port von message_event.go, vereinfacht):
-/// 1 XP-Gewinn pro User pro 60 s, zufällig 15–25 XP, Stunden-/Tageslimit.
+/// 1 XP-Gewinn pro User pro 25 s, zufällig 15–25 XP, Stunden-/Tageslimit.
 /// Level-Ups werden im konfigurierten Bot-Channel angekündigt.
 /// </summary>
 public sealed class MessageXpEvent : IEventListener
 {
     public string Name => "LevelXp";
 
-    private const int CooldownSeconds = 60;
-    private const long HourlyXpLimit = 600;
-    private const long DailyXpLimit = 4000;
+    private const int CooldownSeconds = 25;
+    private const long HourlyXpLimit = 800;
+    private const long DailyXpLimit = 5000;
 
     private readonly LevelRepository _repo;
     private readonly GuildConfigService _guildConfig;

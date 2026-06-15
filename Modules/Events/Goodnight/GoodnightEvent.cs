@@ -12,6 +12,7 @@ public sealed class GoodnightEvent : IEventListener
 {
     public string Name => "Goodnight";
 
+	private readonly string[] GNmessage = new[] { "Gute nacht liebe Kinnas <3", "Schlaft gut ihr kleinen Hosenschisser :3", "Gute Nacht, Gefangene des fleischkörpers!", "schlafet schön. möge euer skellet noch nciht frei brechen. oder so." };
     private readonly DiscordSocketClient _client;
     private readonly GuildConfigService _guildConfig;
     private readonly ILogger<GoodnightEvent> _logger;
@@ -59,12 +60,12 @@ public sealed class GoodnightEvent : IEventListener
             _logger.LogInformation("goodnight: next message in {Wait}", wait);
             await Task.Delay(wait);
 
-            await SendGoodnightMessagesAsync();
+            await SendGoodnightMessagesAsync(GNmessage[new Random().Next(GNmessage.Length)]);
         }
         // ReSharper disable once FunctionNeverReturns
     }
 
-    private async Task SendGoodnightMessagesAsync()
+    private async Task SendGoodnightMessagesAsync(string message)
     {
         var targets = await _guildConfig.GetGuildsWithChannelAsync("main");
 
@@ -73,8 +74,7 @@ public sealed class GoodnightEvent : IEventListener
             try
             {
                 if (_client.GetGuild(guildId)?.GetTextChannel(channelId) is { } channel)
-                    await channel.SendMessageAsync(
-                        "Gute Nacht, Gefangene des Vans! <:TuubaaAwake:1244353418894643271>");
+                    await channel.SendMessageAsync(message);
             }
             catch (Exception ex)
             {
