@@ -7,7 +7,7 @@ namespace DCBot.Events.Welcome;
 
 /// <summary>
 /// Willkommensnachricht (Port von welcome_message.go):
-/// - Accounts jünger als 2 Monate: DM + Kick-Hinweis, keine Begrüßung
+/// - Accounts jünger als 15 Tage: DM + Kick-Hinweis, keine Begrüßung
 /// - 5 s Wartezeit, dann Check ob der User noch im Server ist
 /// - Embed in den Welcome-Channel (statt generiertem PNG im Go-Bot)
 /// - Ankündigung im Main-Channel
@@ -16,7 +16,7 @@ public sealed class WelcomeEvent : IEventListener
 {
     public string Name => "Welcome";
 
-    private static readonly TimeSpan MinAccountAge = TimeSpan.FromDays(60);
+    private static readonly TimeSpan MinAccountAge = TimeSpan.FromDays(15);
 
     private readonly GuildConfigService _guildConfig;
     private readonly ILogger<WelcomeEvent> _logger;
@@ -48,7 +48,7 @@ public sealed class WelcomeEvent : IEventListener
                 var dm = await user.CreateDMChannelAsync();
                 await dm.SendMessageAsync(
                     "Dein Discord Account ist leider noch nicht alt genug, um dem Server beizutreten. " +
-                    "Bitte versuche es erneut, wenn dein Account mindestens 2 Monate alt ist.");
+                    "Bitte versuche es erneut, wenn dein Account mindestens 15 Tage alt ist.");
             }
             catch (Exception ex)
             {

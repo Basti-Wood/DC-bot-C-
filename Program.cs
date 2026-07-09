@@ -6,6 +6,7 @@ using DCBot.Services.Ai;
 using DCBot.Services.Booster;
 using DCBot.Services.Flavor;
 using DCBot.Services.Level;
+using DCBot.Services.Misc;
 using DCBot.Services.Roleplay;
 using Discord;
 using Discord.WebSocket;
@@ -57,6 +58,7 @@ builder.Services.AddSingleton<EventManager>();
 
 // --- Shared services (Services/) — usable by commands and events ---
 builder.Services.AddSingleton<GuildConfigService>();
+builder.Services.AddSingleton<GoodnightService>();
 builder.Services.AddSingleton<BoosterService>();
 builder.Services.AddSingleton<FlavorService>();
 builder.Services.AddSingleton<LevelRepository>();

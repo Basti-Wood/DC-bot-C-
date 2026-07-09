@@ -1,4 +1,5 @@
 using DCBot.Core;
+using DCBot.Services.Misc;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 
@@ -6,25 +7,21 @@ namespace DCBot.Events.Goodnight;
 
 /// <summary>
 /// Schickt jede Mitternacht (Europe/Berlin) eine Gute-Nacht-Nachricht in
-/// alle konfigurierten Main-Channels (Port von goodnight_message.go).
+/// alle aktivierten Main-Channels.
 /// </summary>
 public sealed class GoodnightEvent : IEventListener
 {
     public string Name => "Goodnight";
 
-	private readonly string[] GNmessage = new[] { "Gute nacht liebe Kinnas <3", "Schlaft gut ihr kleinen Hosenschisser :3", "Gute Nacht, Gefangene des fleischkörpers!", "schlafet schön. möge euer skellet noch nciht frei brechen. oder so." };
-    private readonly DiscordSocketClient _client;
-    private readonly GuildConfigService _guildConfig;
+    private readonly GoodnightService _goodnight;
     private readonly ILogger<GoodnightEvent> _logger;
     private int _started;
 
     public GoodnightEvent(
-        DiscordSocketClient client,
-        GuildConfigService guildConfig,
+        GoodnightService goodnight,
         ILogger<GoodnightEvent> logger)
     {
-        _client = client;
-        _guildConfig = guildConfig;
+        _goodnight = goodnight;
         _logger = logger;
     }
 
@@ -60,26 +57,9 @@ public sealed class GoodnightEvent : IEventListener
             _logger.LogInformation("goodnight: next message in {Wait}", wait);
             await Task.Delay(wait);
 
-            await SendGoodnightMessagesAsync(GNmessage[new Random().Next(GNmessage.Length)]);
+            var sentCount = await _goodnight.SendScheduledMessagesAsync();
+            _logger.LogInformation("goodnight: sent scheduled messages to {Count} guild(s)", sentCount);
         }
         // ReSharper disable once FunctionNeverReturns
-    }
-
-    private async Task SendGoodnightMessagesAsync(string message)
-    {
-        var targets = await _guildConfig.GetGuildsWithChannelAsync("main");
-
-        foreach (var (guildId, channelId) in targets)
-        {
-            try
-            {
-                if (_client.GetGuild(guildId)?.GetTextChannel(channelId) is { } channel)
-                    await channel.SendMessageAsync(message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "goodnight: failed to send to {Channel}", channelId);
-            }
-        }
     }
 }

@@ -3,6 +3,8 @@ namespace DCBot.Services.Misc;
 /// <summary>Server-Regeln — geteilt von /rule und /setup rules.</summary>
 public static class Rules
 {
+	private const int MaxChoiceLabelLength = 100;
+
     public static readonly IReadOnlyDictionary<string, string> Texts = new Dictionary<string, string>
     {
         ["1"] = "**§1** Bei unklarheiten im regelwerk müssen die Mods ausnahmsweise darüber entscheiden.",
@@ -21,8 +23,8 @@ public static class Rules
     };
 
     /// <summary>Choice-Labels für den /rule Command (gekürzt wie im Go-Bot).</summary>
-    public static readonly (string Name, string Value)[] Choices =
-    {
+	public static readonly (string Name, string Value)[] Choices = new (string Name, string Value)[]
+	{
         ("§1 Begegne allen Nutzern jederzeit freundlich und respektvoll.", "1"),
 		("§2 Keine Beleidigungen und/oder radikale Aussagen.", "2"),
 		("§3 Keine rassistischen, sexistischen oder anderweitig diskriminierenden Inhalte.", "3"),
@@ -35,7 +37,12 @@ public static class Rules
 		("§10 Keine unnötigen Pings.", "10"),
 		("§11 Seid nett zueinander, auch wenn ihr anderer Meinung seid.", "11"),
 		("§12 Bitte nicht nach FA fragen, die Antwort ist meistens Nein.", "12"),
-    };
+	}
+		.Select(choice => (ShortenChoiceLabel(choice.Name), choice.Value))
+		.ToArray();
+
+	private static string ShortenChoiceLabel(string name)
+		=> name.Length <= MaxChoiceLabelLength ? name : name[..(MaxChoiceLabelLength - 3)] + "...";
 
     public static string DefaultRuleText()
         => string.Join("\n\n", Enumerable.Range(1, Texts.Count)
