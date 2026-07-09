@@ -59,6 +59,7 @@ builder.Services.AddSingleton<EventManager>();
 // --- Shared services (Services/) — usable by commands and events ---
 builder.Services.AddSingleton<GuildConfigService>();
 builder.Services.AddSingleton<GoodnightService>();
+builder.Services.AddSingleton<TextAssetService>();
 builder.Services.AddSingleton<BoosterService>();
 builder.Services.AddSingleton<FlavorService>();
 builder.Services.AddSingleton<LevelRepository>();

@@ -11,6 +11,13 @@ public sealed class RuleCommand : ICommand
     public string Description => "Schicke eine bestimmte Regel in den Chat (Es ist Anonym!)";
     public bool AllowEveryone => true;
 
+    private readonly TextAssetService _textAssets;
+
+    public RuleCommand(TextAssetService textAssets)
+    {
+        _textAssets = textAssets;
+    }
+
     public List<SlashCommandOptionBuilder> BuildOptions()
     {
         var option = new SlashCommandOptionBuilder()
@@ -18,7 +25,7 @@ public sealed class RuleCommand : ICommand
             .WithDescription("Wähle eine Regel")
             .WithType(ApplicationCommandOptionType.String)
             .WithRequired(true);
-        foreach (var (name, value) in Rules.Choices)
+        foreach (var (name, value) in _textAssets.GetRuleChoices())
             option.AddChoice(name, value);
         return new List<SlashCommandOptionBuilder> { option };
     }
@@ -26,8 +33,9 @@ public sealed class RuleCommand : ICommand
     public async Task ExecuteAsync(SocketSlashCommand cmd)
     {
         var ruleValue = (string)cmd.Data.Options.First(o => o.Name == "rule").Value;
+        var rule = _textAssets.GetRules().Rules.FirstOrDefault(entry => entry.Id == ruleValue);
 
-        if (!Rules.Texts.TryGetValue(ruleValue, out var ruleText))
+        if (rule is null)
         {
             await cmd.RespondAsync("Unbekannte Regel.", ephemeral: true);
             return;
@@ -35,7 +43,7 @@ public sealed class RuleCommand : ICommand
 
         // Anonym: Regel als normale Channel-Nachricht, Bestätigung ephemeral
         var embed = new EmbedBuilder()
-            .WithDescription(ruleText)
+            .WithDescription(rule.Text)
             .WithColor(new Color(0x9b59b6))
             .Build();
 

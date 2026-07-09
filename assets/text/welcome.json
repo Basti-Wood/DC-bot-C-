@@ -1,0 +1,8 @@
+{
+  "underageDm": "Dein Discord Account ist leider noch nicht alt genug, um dem Server beizutreten. Bitte versuche es erneut, wenn dein Account mindestens 15 Tage alt ist.",
+  "embedTitle": "Willkommen im verlorenen Wald, {displayName}! 💜",
+  "embedDescriptionWithMainChannel": "Schau doch mal in {mainChannelMention} vorbei!",
+  "embedDescriptionWithoutMainChannel": "Viel Spaß auf dem Server!",
+  "embedFooter": "Mitglied #{memberCount}",
+  "mainAnnouncement": "Ein neues kind hat sich im **verlorenen Wald** verlaufen! Heißt {userMention} willkommen <:HeyTuba:1137369596496707624>"
+}

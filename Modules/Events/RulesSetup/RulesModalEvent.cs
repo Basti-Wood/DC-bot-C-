@@ -15,10 +15,12 @@ public sealed partial class RulesModalEvent : IEventListener
 {
     public string Name => "RulesSetup";
 
+    private readonly TextAssetService _textAssets;
     private readonly ILogger<RulesModalEvent> _logger;
 
-    public RulesModalEvent(ILogger<RulesModalEvent> logger)
+    public RulesModalEvent(TextAssetService textAssets, ILogger<RulesModalEvent> logger)
     {
+        _textAssets = textAssets;
         _logger = logger;
     }
 
@@ -45,7 +47,7 @@ public sealed partial class RulesModalEvent : IEventListener
             .FirstOrDefault(c => c.CustomId == "rule")?.Value?.Trim() ?? "";
 
         if (ruleContent.Length == 0)
-            ruleContent = Rules.DefaultRuleText();
+            ruleContent = _textAssets.BuildDefaultRuleText();
         else
             ruleContent = ParagraphRegex().Replace(ruleContent, "**$1**");
 

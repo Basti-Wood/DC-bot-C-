@@ -7,21 +7,18 @@ public sealed class GoodnightService
 {
     private const string EnabledKey = "goodnight:enabled";
 
-    private static readonly string[] Messages =
-    {
-        "Gute nacht liebe Kinnas <3",
-        "Schlaft gut ihr kleinen Hosenschisser :3",
-        "Gute Nacht, Gefangene des fleischkörpers!",
-        "schlafet schön. möge euer skellet noch nciht frei brechen. oder so."
-    };
-
     private readonly DiscordSocketClient _client;
     private readonly GuildConfigService _guildConfig;
+    private readonly TextAssetService _textAssets;
 
-    public GoodnightService(DiscordSocketClient client, GuildConfigService guildConfig)
+    public GoodnightService(
+        DiscordSocketClient client,
+        GuildConfigService guildConfig,
+        TextAssetService textAssets)
     {
         _client = client;
         _guildConfig = guildConfig;
+        _textAssets = textAssets;
     }
 
     public async Task<bool> IsEnabledAsync(ulong guildId)
@@ -55,7 +52,11 @@ public sealed class GoodnightService
         if (_client.GetGuild(guildId)?.GetTextChannel(channelId.Value) is not { } channel)
             return false;
 
-        await channel.SendMessageAsync(Messages[Random.Shared.Next(Messages.Length)]);
+        var messages = _textAssets.GetGoodnight().Messages;
+        if (messages.Count == 0)
+            return false;
+
+        await channel.SendMessageAsync(messages[Random.Shared.Next(messages.Count)]);
         return true;
     }
 

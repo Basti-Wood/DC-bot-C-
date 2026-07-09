@@ -1,4 +1,5 @@
 using DCBot.Core;
+using DCBot.Services.Misc;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
@@ -19,11 +20,16 @@ public sealed class WelcomeEvent : IEventListener
     private static readonly TimeSpan MinAccountAge = TimeSpan.FromDays(15);
 
     private readonly GuildConfigService _guildConfig;
+    private readonly TextAssetService _textAssets;
     private readonly ILogger<WelcomeEvent> _logger;
 
-    public WelcomeEvent(GuildConfigService guildConfig, ILogger<WelcomeEvent> logger)
+    public WelcomeEvent(
+        GuildConfigService guildConfig,
+        TextAssetService textAssets,
+        ILogger<WelcomeEvent> logger)
     {
         _guildConfig = guildConfig;
+        _textAssets = textAssets;
         _logger = logger;
     }
 
@@ -43,12 +49,11 @@ public sealed class WelcomeEvent : IEventListener
         {
             _logger.LogDebug("welcome: account {User} too new ({Days} days), sending DM",
                 user.Id, (int)accountAge.TotalDays);
+            var welcomeText = _textAssets.GetWelcome();
             try
             {
                 var dm = await user.CreateDMChannelAsync();
-                await dm.SendMessageAsync(
-                    "Dein Discord Account ist leider noch nicht alt genug, um dem Server beizutreten. " +
-                    "Bitte versuche es erneut, wenn dein Account mindestens 15 Tage alt ist.");
+                await dm.SendMessageAsync(welcomeText.UnderageDm);
             }
             catch (Exception ex)
             {
@@ -68,17 +73,25 @@ public sealed class WelcomeEvent : IEventListener
 
         var welcomeChannelId = await _guildConfig.GetChannelAsync(guild.Id, "welcome");
         var mainChannelId = await _guildConfig.GetChannelAsync(guild.Id, "main");
+        var welcomeTextAsset = _textAssets.GetWelcome();
+        var templateValues = new Dictionary<string, string>
+        {
+            ["displayName"] = user.DisplayName ?? user.GlobalName ?? user.Username,
+            ["memberCount"] = guild.MemberCount.ToString(),
+            ["userMention"] = user.Mention,
+            ["mainChannelMention"] = mainChannelId is { } mainId ? $"<#{mainId}>" : string.Empty,
+        };
 
         if (welcomeChannelId is { } wcId && guild.GetTextChannel(wcId) is { } welcomeChannel)
         {
-            var displayName = user.DisplayName ?? user.GlobalName ?? user.Username;
+            var descriptionTemplate = mainChannelId is { }
+                ? welcomeTextAsset.EmbedDescriptionWithMainChannel
+                : welcomeTextAsset.EmbedDescriptionWithoutMainChannel;
             var embed = new EmbedBuilder()
-                .WithTitle($"Willkommen im goldenen Van, {displayName}! 💜")
-                .WithDescription(mainChannelId is { } mc
-                    ? $"Schau doch mal in <#{mc}> vorbei!"
-                    : "Viel Spaß auf dem Server!")
+                .WithTitle(TextAssetService.RenderTemplate(welcomeTextAsset.EmbedTitle, templateValues))
+                .WithDescription(TextAssetService.RenderTemplate(descriptionTemplate, templateValues))
                 .WithThumbnailUrl(user.GetDisplayAvatarUrl(size: 1024) ?? user.GetDefaultAvatarUrl())
-                .WithFooter($"Mitglied #{guild.MemberCount}")
+                .WithFooter(TextAssetService.RenderTemplate(welcomeTextAsset.EmbedFooter, templateValues))
                 .WithColor(new Color(0x9b59b6))
                 .WithCurrentTimestamp()
                 .Build();
@@ -99,7 +112,7 @@ public sealed class WelcomeEvent : IEventListener
             try
             {
                 await mainChannel.SendMessageAsync(
-                    $"Ein neuer gefangener im **goldenen Van**! Heißt <@{user.Id}> willkommen <:HeyTuba:1137369596496707624>");
+                    TextAssetService.RenderTemplate(welcomeTextAsset.MainAnnouncement, templateValues));
             }
             catch (Exception ex)
             {
