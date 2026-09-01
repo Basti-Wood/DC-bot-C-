@@ -19,6 +19,7 @@ public sealed class EventManager
     private readonly List<Func<SocketUser, SocketVoiceState, SocketVoiceState, Task>> _voiceStateUpdated = new();
     private readonly List<Func<SocketModal, Task>> _modalSubmitted = new();
     private readonly List<Func<SocketMessageComponent, Task>> _buttonExecuted = new();
+    private readonly List<Func<SocketMessageComponent, Task>> _selectMenuExecuted = new();
     private readonly List<Func<Task>> _ready = new();
 
     private readonly ILogger<EventManager> _logger;
@@ -39,6 +40,7 @@ public sealed class EventManager
     public void OnVoiceStateUpdated(Func<SocketUser, SocketVoiceState, SocketVoiceState, Task> handler) => _voiceStateUpdated.Add(handler);
     public void OnModalSubmitted(Func<SocketModal, Task> handler) => _modalSubmitted.Add(handler);
     public void OnButtonExecuted(Func<SocketMessageComponent, Task> handler) => _buttonExecuted.Add(handler);
+    public void OnSelectMenuExecuted(Func<SocketMessageComponent, Task> handler) => _selectMenuExecuted.Add(handler);
     public void OnReady(Func<Task> handler) => _ready.Add(handler);
 
     /// <summary>Wire all subscribed handlers to the Discord client. Called once at startup.</summary>
@@ -56,6 +58,7 @@ public sealed class EventManager
         client.UserVoiceStateUpdated += (user, before, after) => Dispatch(_voiceStateUpdated, h => h(user, before, after));
         client.ModalSubmitted += modal => Dispatch(_modalSubmitted, h => h(modal));
         client.ButtonExecuted += component => Dispatch(_buttonExecuted, h => h(component));
+        client.SelectMenuExecuted += component => Dispatch(_selectMenuExecuted, h => h(component));
         client.Ready += () => Dispatch(_ready, h => h());
     }
 

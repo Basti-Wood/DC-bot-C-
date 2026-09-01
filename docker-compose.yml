@@ -38,6 +38,7 @@ services:
       DISCORD_TOKEN: ${DISCORD_TOKEN_MAIN:?set DISCORD_TOKEN_MAIN in .env}
       GUILD_ID: ${GUILD_ID_MAIN:-}
       LOG_DEBUG: ${LOG_DEBUG:-false}
+      OWNER_ID: ${OWNER_ID:-}
       GPT_TOKEN: ${GPT_TOKEN:-}
       BASTIAPI: ${BASTIAPI:-}
       DB_HOST: mariadb
@@ -66,6 +67,7 @@ services:
       DISCORD_TOKEN: ${DISCORD_TOKEN_SECOND:-}
       GUILD_ID: ${GUILD_ID_SECOND:-}
       LOG_DEBUG: ${LOG_DEBUG:-false}
+      OWNER_ID: ${OWNER_ID:-}
       GPT_TOKEN: ${GPT_TOKEN:-}
       BASTIAPI: ${BASTIAPI:-}
       DB_HOST: mariadb

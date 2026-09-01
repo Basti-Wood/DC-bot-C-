@@ -1,4 +1,6 @@
 using DCBot.Commands;
+using DCBot.Commands.Imposter;
+using DCBot.Commands.Werwolf;
 using DCBot.Core;
 using DCBot.Core.Database;
 using DCBot.Events;
@@ -64,6 +66,8 @@ builder.Services.AddSingleton<BoosterService>();
 builder.Services.AddSingleton<FlavorService>();
 builder.Services.AddSingleton<LevelRepository>();
 builder.Services.AddSingleton<RoleplayApi>();
+builder.Services.AddSingleton<WerwolfGameManager>();
+builder.Services.AddSingleton<ImposterGameManager>();
 builder.Services.AddSingleton<AiService>();
 
 // --- The bot host service ---

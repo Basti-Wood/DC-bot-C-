@@ -1,0 +1,110 @@
+{
+  "groups": [
+    {
+      "name": "Essen & Trinken",
+      "questions": [
+        "Was ist dein Lieblingsessen?",
+        "Was ist dein Lieblingsgetränk?",
+        "Was isst du am liebsten zum Frühstück?",
+        "Was isst du am liebsten zum Abendessen?",
+        "Welches Fast Food magst du am liebsten?",
+        "In welches Restaurant gehst du am liebsten?",
+        "Was ist dein Lieblingsobst?",
+        "Was ist dein Lieblingsgemüse?",
+        "Welchen Kuchen magst du am liebsten?",
+        "Welche Eissorte magst du am liebsten?",
+        "Was ist dein liebster Snack?",
+        "Was kannst du überhaupt nicht essen?"
+      ]
+    },
+    {
+      "name": "Zeit & Alltag",
+      "questions": [
+        "Wann bist du heute aufgestanden?",
+        "Wann bist du gestern ins Bett gegangen?",
+        "Was hast du letztes Wochenende gemacht?",
+        "Was hast du gestern Abend gemacht?",
+        "Wann hattest du zuletzt Geburtstag?",
+        "Wann hast du zuletzt jemandem ein Geschenk gemacht?",
+        "Was war dein letzter Kinofilm?",
+        "Welche Serie hast du zuletzt geschaut?",
+        "Wann warst du zuletzt im Urlaub?",
+        "Wie lange brauchst du morgens im Bad?",
+        "Wann war dein letzter freier Tag?"
+      ]
+    },
+    {
+      "name": "Orte & Reisen",
+      "questions": [
+        "Welchen Ort würdest du gerne besuchen?",
+        "Welche Stadt würdest du gerne besuchen?",
+        "Wo würdest du gerne wohnen?",
+        "Wo war dein schönster Urlaub?",
+        "Welches Land fasziniert dich am meisten?",
+        "Welche Stadt fasziniert dich am meisten?",
+        "Wo warst du zuletzt im Urlaub?",
+        "Wo würdest du nie wieder Urlaub machen?",
+        "Was ist der schönste Ort, den du je gesehen hast?",
+        "Was ist der interessanteste Ort, den du je besucht hast?",
+        "Wohin würdest du sofort reisen, wenn Geld keine Rolle spielt?"
+      ]
+    },
+    {
+      "name": "Tiere",
+      "questions": [
+        "Welches Tier wärst du gerne?",
+        "Welches Tier findest du am gruseligsten?",
+        "Was ist dein Lieblingstier?",
+        "Welches Haustier hättest du gerne?",
+        "Welches Haustier hattest du als Kind?",
+        "Welches Tier findest du am süßesten?",
+        "Vor welchem Tier hast du am meisten Angst?",
+        "Welches Tier würdest du gerne mal im Zoo sehen?"
+      ]
+    },
+    {
+      "name": "Sport",
+      "questions": [
+        "Welche Sportart machst du gerne?",
+        "Welche Sportart schaust du gerne?",
+        "Was ist dein Lieblingssportverein?",
+        "Wer ist dein Lieblingssportler?",
+        "Wie oft trainierst du pro Woche?",
+        "Welchen Sport würdest du gerne mal ausprobieren?",
+        "Welchen Sport hast du als Kind gemacht?",
+        "Welches sportliche Ziel hast du dir gesetzt?"
+      ]
+    },
+    {
+      "name": "Medien & Unterhaltung",
+      "questions": [
+        "Welchen Film könntest du immer wieder schauen?",
+        "Welche Serie könntest du immer wieder schauen?",
+        "Was ist dein Lieblingsbuch?",
+        "Was ist dein Lieblingsvideospiel?",
+        "Welchen Song hörst du gerade rauf und runter?",
+        "Welches Album hörst du gerade rauf und runter?",
+        "Welche App benutzt du am meisten?",
+        "Welchen YouTuber schaust du am liebsten?",
+        "Was war der letzte Film, den du im Kino gesehen hast?",
+        "Welches Spiel hast du als Kind am meisten gespielt?"
+      ]
+    },
+    {
+      "name": "Hypothetisch",
+      "questions": [
+        "Was würdest du mit einer Million Euro machen?",
+        "Was würdest du tun, wenn du unsichtbar wärst?",
+        "Welche Superkraft hättest du gerne?",
+        "Welchen Superhelden würdest du gerne sein?",
+        "Was würdest du an dir ändern, wenn du könntest?",
+        "Was würdest du an der Welt ändern, wenn du könntest?",
+        "Was würdest du deinem 10-jährigen Ich sagen?",
+        "Was würdest du deinem 20-jährigen Ich sagen?",
+        "In welche Zeit würdest du reisen, wenn du könntest?",
+        "Was würdest du tun, wenn heute dein letzter Tag wäre?",
+        "Mit welcher berühmten Person würdest du einen Tag tauschen?"
+      ]
+    }
+  ]
+}

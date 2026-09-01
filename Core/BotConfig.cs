@@ -14,6 +14,9 @@ public sealed class BotConfig
     public required string ConnectionString { get; init; }
     public bool Debug { get; init; }
 
+    /// <summary>Discord-User-Id des Bot-Owners (OWNER_ID) — darf Debug-Befehle nutzen.</summary>
+    public ulong? OwnerId { get; init; }
+
     public static BotConfig FromEnvironment()
     {
         var token = Env("DISCORD_TOKEN") ?? Env("TOKEN")
@@ -34,6 +37,7 @@ public sealed class BotConfig
             Token = token,
             GuildId = Env("GUILD_ID"),
             Debug = Env("LOG_DEBUG") == "true",
+            OwnerId = ulong.TryParse(Env("OWNER_ID"), out var ownerId) ? ownerId : null,
             ConnectionString =
                 $"Server={dbHost};Port={dbPort};Database={dbName};User={dbUser};Password={dbPass};",
         };

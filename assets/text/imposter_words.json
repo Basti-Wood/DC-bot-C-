@@ -1,0 +1,58 @@
+{
+  "groups": [
+    {
+      "name": "Tiere",
+      "words": [
+        "Hund", "Katze", "Löwe", "Tiger", "Pinguin", "Papagei",
+        "Hai", "Delfin", "Adler", "Falke", "Bär", "Wolf",
+        "Schlange", "Echse", "Fledermaus", "Eule", "Känguru", "Koala",
+        "Pferd", "Esel", "Fuchs", "Hase", "Igel", "Maulwurf"
+      ]
+    },
+    {
+      "name": "Essen & Trinken",
+      "words": [
+        "Pizza", "Pasta", "Burger", "Hotdog", "Kaffee", "Tee",
+        "Sushi", "Ramen", "Schokolade", "Kuchen", "Bier", "Wein",
+        "Pommes", "Chips", "Pancakes", "Waffeln", "Apfel", "Birne",
+        "Eis", "Pudding", "Steak", "Schnitzel", "Curry", "Suppe"
+      ]
+    },
+    {
+      "name": "Orte",
+      "words": [
+        "Strand", "Pool", "Flughafen", "Bahnhof", "Kino", "Theater",
+        "Bibliothek", "Buchhandlung", "Krankenhaus", "Zahnarztpraxis",
+        "Campingplatz", "Hotel", "Supermarkt", "Bauernmarkt",
+        "Schule", "Universität", "Freizeitpark", "Zoo", "Museum", "Galerie"
+      ]
+    },
+    {
+      "name": "Berufe",
+      "words": [
+        "Arzt", "Krankenschwester", "Lehrer", "Professor", "Pilot",
+        "Flugbegleiter", "Feuerwehrmann", "Polizist", "Koch", "Bäcker",
+        "Maler", "Zeichner", "Fotograf", "Kameramann", "Anwalt", "Richter",
+        "Elektriker", "Installateur", "Gärtner", "Förster", "Metzger", "Friseur"
+      ]
+    },
+    {
+      "name": "Sport",
+      "words": [
+        "Fußball", "Basketball", "Schwimmen", "Tauchen", "Tennis",
+        "Badminton", "Ski", "Snowboard", "Laufen", "Radfahren",
+        "Boxen", "Ringen", "Volleyball", "Handball", "Golf", "Billard",
+        "Klettern", "Bouldern", "Eishockey", "Feldhockey", "Segeln", "Surfen"
+      ]
+    },
+    {
+      "name": "Technik & Alltag",
+      "words": [
+        "Handy", "Tablet", "Laptop", "Computer", "Fernseher", "Beamer",
+        "Fahrrad", "Roller", "Auto", "Motorrad", "Uhr", "Armbanduhr",
+        "Kopfhörer", "Lautsprecher", "Kamera", "Waschmaschine", "Trockner",
+        "Mikrowelle", "Ofen", "Staubsauger", "Bügeleisen"
+      ]
+    }
+  ]
+}
