@@ -30,7 +30,6 @@ DC bot C#/
 │   │   ├── SetLevel/ /setlevel  ├── Cookie/    /cookie
 │   │   ├── Rp/       /rp        ├── SwitchApi/ /switchapi
 │   │   ├── SetGif/   /setgif    ├── ChangeAi/  /changeai
-│   │   ├── LoadAi/   /loadai    ├── UnloadAi/  /unloadai
 │   │   └── SetPrompt/ /setprompt
 │   └── Events/               ── ALLE GATEWAY EVENTS ──
 │       ├── EventManager.cs     ← DER Event Manager
@@ -118,7 +117,6 @@ dotnet run
 | `/switchapi` | Admin | GIF-Quelle: Otaku / Basti / Both |
 | `/setgif reaction url` | Admin | GIF in der Basti API speichern |
 | `/changeai` | Admin | AI-Backend: OpenAI / Basti / Disabled |
-| `/loadai`, `/unloadai` | Admin | Basti-Modell laden / entladen |
 | `/setprompt [prompt]` | Admin | System-Prompt fürs Basti-Backend |
 | `/setlistenwindow seconds` | Admin | Zeitfenster für HeyLookListen setzen (0–120 s) 0 = deaktiviert |
 
@@ -246,8 +244,7 @@ welcher Bot den Eintrag besitzt.
 - **„Privileged intent provided is not enabled"** → Im Developer Portal
   unter Bot die Intents `SERVER MEMBERS` und `MESSAGE CONTENT` aktivieren.
 - **AI antwortet nicht** → AI ist standardmäßig aus: `/changeai` nutzen.
-  Für OpenAI muss `GPT_TOKEN` gesetzt sein, für Basti `BASTIAPI` +
-  `/loadai`.
+  Für OpenAI muss `GPT_TOKEN` gesetzt sein, für Basti `BASTIAPI`.
 - **DB-Verbindungsfehler beim ersten Start** → Normal, der Bot wartet mit
   Retry, bis MariaDB bereit ist.
 - **Daten komplett zurücksetzen** → `docker compose down` und den Ordner

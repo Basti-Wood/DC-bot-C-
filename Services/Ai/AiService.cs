@@ -19,7 +19,7 @@ public enum AiBackend
 /// - backend switching (OpenAI / Basti API / disabled)
 /// - per-channel conversation cache (5 min expiry, OpenAI only)
 /// - serial processing queue (so requests never run in parallel)
-/// - Basti API model load/unload + custom system prompt
+/// - Basti API custom system prompt
 /// </summary>
 public sealed class AiService
 {
@@ -31,7 +31,6 @@ public sealed class AiService
 
     // ---- backend state ----
     public AiBackend ActiveBackend { get; set; } = AiBackend.Disabled;
-    public bool BastiLoaded { get; private set; }
     public string BastiPrompt { get; set; } = "";
 
     // ---- conversation cache (channelId -> messages) ----
@@ -205,23 +204,6 @@ public sealed class AiService
         request.Headers.Add("X-API-Key", key);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key);
         return request;
-    }
-
-    public async Task LoadBastiAsync()
-    {
-        using var request = CreateBastiRequest(HttpMethod.Post, "/loadmodel");
-        using var response = await _http.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-        BastiLoaded = true;
-    }
-
-    public async Task UnloadBastiAsync()
-    {
-        BastiPrompt = "";
-        BastiLoaded = false;
-        using var request = CreateBastiRequest(HttpMethod.Post, "/unloadmodel");
-        using var response = await _http.SendAsync(request);
-        response.EnsureSuccessStatusCode();
     }
 
     private sealed record BastiResponse(string? generated_text, string? text);

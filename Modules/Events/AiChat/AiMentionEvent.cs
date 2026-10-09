@@ -49,9 +49,6 @@ public sealed partial class AiMentionEvent : IEventListener
         // AI global deaktiviert
         if (_ai.ActiveBackend == AiBackend.Disabled) return;
 
-        // Basti-Backend braucht ein geladenes Modell
-        if (_ai.ActiveBackend == AiBackend.Basti && !_ai.BastiLoaded) return;
-
         var botId = _client.CurrentUser?.Id;
         if (botId is null) return;
 

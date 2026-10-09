@@ -53,8 +53,7 @@ public sealed class ChangeAiCommand : ICommand
                     return;
                 }
                 _ai.ActiveBackend = AiBackend.Basti;
-                var hint = _ai.BastiLoaded ? "" : " (Modell noch nicht geladen — nutze `/loadai`)";
-                await cmd.RespondAsync($"AI-Backend: **Basti** ✅{hint}", ephemeral: true);
+                await cmd.RespondAsync("AI-Backend: **Basti** ✅", ephemeral: true);
                 break;
 
             case "disabled":
