@@ -94,7 +94,7 @@ public sealed class AiService
         {
             reply = ActiveBackend == AiBackend.OpenAi
                 ? await GetOpenAiResponseAsync(item.Prompt, item.Message.Channel.Id)
-                : await GetBastiResponseAsync(item.Prompt);
+                : await GetBastiResponseAsync(item.Prompt, item.Message.Author.Id);
 
             if (ActiveBackend == AiBackend.OpenAi)
                 AddMessageToCache(item.Message.Channel.Id, "assistant", reply);
@@ -208,9 +208,10 @@ public sealed class AiService
 
     private sealed record BastiResponse(string? generated_text, string? text);
 
-    private async Task<string> GetBastiResponseAsync(string message)
+    private async Task<string>     GetBastiResponseAsync(string message, ulong userId)
     {
-        var query = $"/generatetext?input_text={Uri.EscapeDataString(message)}";
+            // The API keeps conversation memory per "user"; without it all chats share one polluted memory
+            var query = $"/generatetext?input_text={Uri.EscapeDataString(message)}&user={userId}";
         var systemPrompt = string.IsNullOrEmpty(BastiPrompt) ? Personality.SystemPrompt : BastiPrompt;
         query += $"&system_prompt={Uri.EscapeDataString(systemPrompt)}";
 
