@@ -211,8 +211,8 @@ public sealed class AiService
     private async Task<string> GetBastiResponseAsync(string message)
     {
         var query = $"/generatetext?input_text={Uri.EscapeDataString(message)}";
-        if (!string.IsNullOrEmpty(BastiPrompt))
-            query += $"&system_prompt={Uri.EscapeDataString(BastiPrompt)}";
+        var systemPrompt = string.IsNullOrEmpty(BastiPrompt) ? Personality.SystemPrompt : BastiPrompt;
+        query += $"&system_prompt={Uri.EscapeDataString(systemPrompt)}";
 
         using var request = CreateBastiRequest(HttpMethod.Get, query);
         using var response = await _http.SendAsync(request);
