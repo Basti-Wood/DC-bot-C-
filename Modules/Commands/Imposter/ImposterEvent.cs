@@ -30,13 +30,15 @@ public sealed class ImposterEvent : IEventListener
     private async Task HandleButtonAsync(SocketMessageComponent comp)
     {
         if (!comp.Data.CustomId.StartsWith("imp:", StringComparison.Ordinal)) return;
-        await comp.DeferAsync();
+        var (game, action, extra) = Resolve(comp);
+        // "answer" öffnet ein Modal — das geht nur ohne vorheriges Defer.
+        if (action != "answer") await comp.DeferAsync();
         try
         {
-            var (game, action, extra) = Resolve(comp);
             if (game is null)
             {
-                await comp.FollowupAsync("Dieses Spiel existiert nicht mehr.", ephemeral: true);
+                if (action == "answer") await comp.RespondAsync("Dieses Spiel existiert nicht mehr.", ephemeral: true);
+                else await comp.FollowupAsync("Dieses Spiel existiert nicht mehr.", ephemeral: true);
                 return;
             }
             await game.HandleButtonAsync(comp, action, extra);

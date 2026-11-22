@@ -7,7 +7,7 @@ namespace DCBot.Commands.Farben;
 
 /// <summary>
 /// /farben — Farb-Rolle für Booster (Port von farben_command.go).
-/// Braucht die "Booster_role"-Rolle. "Rainbow" aktiviert die Rotation.
+/// Braucht die "Role_booster"-Rolle. "Rainbow" aktiviert die Rotation.
 /// </summary>
 public sealed class FarbenCommand : ICommand
 {
@@ -96,7 +96,7 @@ public sealed class FarbenCommand : ICommand
         }
 
         // Alle anderen wählbaren Rollen entfernen, gewünschte hinzufügen
-        foreach (var roleKey in BoosterService.SelectableRoleKeys)
+        foreach (var roleKey in roleMap.Keys)
         {
             if (string.Equals(roleKey, selectedRoleKey, StringComparison.OrdinalIgnoreCase))
                 continue;

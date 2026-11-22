@@ -1,12 +1,13 @@
 using DCBot.Core.Database;
 using DCBot.Core.Database.Entities;
+using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 
 namespace DCBot.Core;
 
 /// <summary>
 /// Shared access to per-guild key/value config. All scoped to this BotId.
-/// Keys:  channel:&lt;which&gt;   role:&lt;key&gt;   levelrole:&lt;threshold&gt;
+/// Keys:  channel:&lt;which&gt;   role:&lt;key&gt;   (Level-Rollen: role:Role_level_&lt;N&gt;)
 /// </summary>
 public sealed class GuildConfigService
 {
@@ -103,12 +104,79 @@ public sealed class GuildConfigService
 
     // ---------- level roles ----------
 
-    public async Task<ulong?> GetLevelRoleAsync(ulong guildId, int threshold)
+    public const string LevelRolePrefix = "Role_level_";
+
+    public static string LevelRoleKey(int level) => $"{LevelRolePrefix}{level}";
+
+    public Task SetLevelRoleAsync(ulong guildId, int level, ulong roleId)
+        => SetRoleAsync(guildId, LevelRoleKey(level), roleId);
+
+    /// <summary>Alle konfigurierten Level-Rollen der Guild, aufsteigend nach Level.</summary>
+    public async Task<List<(int Level, ulong RoleId)>> GetLevelRolesAsync(ulong guildId)
     {
-        var value = await GetAsync(guildId, $"levelrole:{threshold}");
-        return ulong.TryParse(value, out var id) ? id : null;
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        var prefix = $"role:{LevelRolePrefix}";
+        var entries = await db.GuildConfigs.AsNoTracking()
+            .Where(c => c.BotId == _config.BotId && c.GuildId == guildId && c.Key.StartsWith(prefix))
+            .ToListAsync();
+
+        var result = new List<(int Level, ulong RoleId)>();
+        foreach (var e in entries)
+            if (int.TryParse(e.Key[prefix.Length..], out var lvl) && ulong.TryParse(e.Value, out var id))
+                result.Add((lvl, id));
+        return result.OrderBy(r => r.Level).ToList();
     }
 
-    public Task SetLevelRoleAsync(ulong guildId, int threshold, ulong roleId)
-        => SetAsync(guildId, $"levelrole:{threshold}", roleId.ToString());
+    /// <summary>Gibt dem User die höchste erreichte Level-Rolle und entfernt alle anderen Level-Rollen.</summary>
+    public async Task ApplyLevelRoleAsync(SocketGuildUser user, int level)
+    {
+        var roles = await GetLevelRolesAsync(user.Guild.Id);
+        var target = roles.LastOrDefault(r => r.Level <= level).RoleId;
+
+        var remove = roles.Select(r => r.RoleId)
+            .Where(id => id != target && user.Roles.Any(r => r.Id == id))
+            .Distinct().ToList();
+        if (remove.Count > 0) await user.RemoveRolesAsync(remove);
+        if (target != 0 && user.Roles.All(r => r.Id != target)) await user.AddRoleAsync(target);
+    }
+
+    // ---------- Migration alter Keys ----------
+
+    private static readonly (string Old, string New)[] RenamedRoleKeys =
+    {
+        ("ROLE_UNSCHULDIGES_KIND", "Role_standard"),
+        ("ROLE_VERDAECHTIGES_KIND", "Role_level_20"),
+        ("ROLE_SCHULDIGES_KIND", "Role_level_40"),
+        ("ROLE_MIT_ENTFUEHRER", "Role_level_60"),
+        ("ROLE_MEISTERENTFUEHRER", "Role_level_80"),
+        ("ROLE_BEIFAHRER", "Role_level_100"),
+        ("ROLE_VAN_UPGRADER", "Role_booster"),
+    };
+
+    /// <summary>Benennt alte Config-Keys einmalig in die neuen, generischen Keys um.</summary>
+    public async Task MigrateKeysAsync()
+    {
+        var map = new Dictionary<string, string>();
+        foreach (var (o, n) in RenamedRoleKeys)
+        {
+            map[$"role:{o}"] = $"role:{n}";
+            map[$"flavor:booster:{o}"] = $"flavor:booster:{n}";
+        }
+
+        await using var db = await _dbFactory.CreateDbContextAsync();
+        var all = await db.GuildConfigs.Where(c => c.BotId == _config.BotId).ToListAsync();
+        var existing = all.Select(c => (c.GuildId, c.Key)).ToHashSet();
+
+        foreach (var entry in all)
+        {
+            var newKey = map.GetValueOrDefault(entry.Key)
+                ?? (entry.Key.StartsWith("levelrole:") ? $"role:{LevelRolePrefix}{entry.Key["levelrole:".Length..]}" : null);
+            if (newKey is null) continue;
+
+            if (existing.Add((entry.GuildId, newKey))) entry.Key = newKey;
+            else db.GuildConfigs.Remove(entry);
+        }
+
+        await db.SaveChangesAsync();
+    }
 }

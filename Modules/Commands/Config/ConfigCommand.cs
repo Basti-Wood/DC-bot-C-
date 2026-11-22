@@ -1,4 +1,5 @@
 using DCBot.Core;
+using DCBot.Services.Level;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
@@ -31,22 +32,11 @@ public sealed class ConfigCommand : ICommand
 
     private static readonly (string Name, string Value)[] RoleChoices =
     {
-        ("standard role", "ROLE_UNSCHULDIGES_KIND"),
-        ("level 20 role", "ROLE_VERDAECHTIGES_KIND"),
-        ("level 40 role", "ROLE_SCHULDIGES_KIND"),
-        ("level 60 role", "ROLE_MIT_ENTFUEHRER"),
-        ("level 80 role", "ROLE_MEISTERENTFUEHRER"),
-        ("level 100 role", "ROLE_BEIFAHRER"),
-        ("Booster_role", "ROLE_VAN_UPGRADER"),
+        ("Standard Role", "Role_standard"),
+        ("Booster Role", "Role_booster"),
         ("Join Role", "join_role"),
         ("Team Role", "team_role"),
         ("Artist Role", "artist_role"),
-    };
-
-    private static readonly (string Name, string Value)[] LevelChoices =
-    {
-        ("Level 20", "20"), ("Level 40", "40"), ("Level 60", "60"),
-        ("Level 80", "80"), ("Level 100", "100"),
     };
 
     private readonly GuildConfigService _guildConfig;
@@ -94,11 +84,13 @@ public sealed class ConfigCommand : ICommand
                 .WithType(ApplicationCommandOptionType.Role)
                 .WithRequired(true));
 
-        var levelOption = AddChoices(new SlashCommandOptionBuilder()
+        var levelOption = new SlashCommandOptionBuilder()
             .WithName("level")
-            .WithDescription("Level-Meilenstein")
-            .WithType(ApplicationCommandOptionType.String)
-            .WithRequired(true), LevelChoices);
+            .WithDescription("Ab welchem Level die Rolle vergeben wird")
+            .WithType(ApplicationCommandOptionType.Integer)
+            .WithMinValue(1)
+            .WithMaxValue(XpMath.MaxLevel)
+            .WithRequired(true);
 
         var setLevelRole = new SlashCommandOptionBuilder()
             .WithName("setlevelrole")
@@ -153,10 +145,10 @@ public sealed class ConfigCommand : ICommand
             }
             case "setlevelrole":
             {
-                var level = int.Parse((string)sub.Options.First(o => o.Name == "level").Value);
+                var level = (int)(long)sub.Options.First(o => o.Name == "level").Value;
                 var role = (IRole)sub.Options.First(o => o.Name == "role").Value;
                 await _guildConfig.SetLevelRoleAsync(guildId, level, role.Id);
-                _logger.LogInformation("config: levelrole:{Level} = {Role} ({Guild})", level, role.Id, guildId);
+                _logger.LogInformation("config: role:Role_level_{Level} = {Role} ({Guild})", level, role.Id, guildId);
                 await cmd.RespondAsync($"Level-Rolle gespeichert: Level **{level}** → {role.Mention}", ephemeral: true);
                 break;
             }

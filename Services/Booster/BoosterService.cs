@@ -8,31 +8,18 @@ namespace DCBot.Services.Booster;
 /// <summary>Booster-Farb-Rollen + Rainbow-Persistenz (Port des booster-Moduls).</summary>
 public sealed class BoosterService
 {
-    /// <summary>Wählbare Rollen-Keys — Reihenfolge = Rainbow-Rotation.</summary>
-    public static readonly string[] SelectableRoleKeys =
-    {
-        "ROLE_UNSCHULDIGES_KIND",
-        "ROLE_VERDAECHTIGES_KIND",
-        "ROLE_SCHULDIGES_KIND",
-        "ROLE_MIT_ENTFUEHRER",
-        "ROLE_MEISTERENTFUEHRER",
-        "ROLE_BEIFAHRER",
-        "ROLE_VAN_UPGRADER",
-    };
+    public const string StandardRoleKey = "Role_standard";
+    public const string BoosterGateRoleKey = "Role_booster";
 
-    /// <summary>Config-Key → Default-Anzeigename.</summary>
-    public static readonly IReadOnlyDictionary<string, string> DefaultRoleLabels = new Dictionary<string, string>
+    /// <summary>Wählbare Rollen-Keys — Standard, alle Level-Rollen (aufsteigend), Booster.</summary>
+    public async Task<List<string>> GetSelectableRoleKeysAsync(ulong guildId)
     {
-        ["ROLE_UNSCHULDIGES_KIND"] = "standard role",
-        ["ROLE_VERDAECHTIGES_KIND"] = "level 20 role",
-        ["ROLE_SCHULDIGES_KIND"] = "level 40 role",
-        ["ROLE_MIT_ENTFUEHRER"] = "level 60 role",
-        ["ROLE_MEISTERENTFUEHRER"] = "level 80 role",
-        ["ROLE_BEIFAHRER"] = "level 100 role",
-        ["ROLE_VAN_UPGRADER"] = "Booster_role",
-    };
-
-    public const string BoosterGateRoleKey = "ROLE_VAN_UPGRADER";
+        var keys = new List<string> { StandardRoleKey };
+        keys.AddRange((await _guildConfig.GetLevelRolesAsync(guildId))
+            .Select(r => GuildConfigService.LevelRoleKey(r.Level)));
+        keys.Add(BoosterGateRoleKey);
+        return keys;
+    }
 
     private readonly IDbContextFactory<BotDbContext> _dbFactory;
     private readonly BotConfig _config;
@@ -48,8 +35,14 @@ public sealed class BoosterService
         _guildConfig = guildConfig;
     }
 
-    public static string GetDefaultRoleLabel(string roleKey)
-        => DefaultRoleLabels.TryGetValue(roleKey, out var label) ? label : roleKey;
+    public static string GetDefaultRoleLabel(string roleKey) => roleKey switch
+    {
+        StandardRoleKey => "Standard",
+        BoosterGateRoleKey => "Booster",
+        _ when roleKey.StartsWith(GuildConfigService.LevelRolePrefix)
+            => $"Level {roleKey[GuildConfigService.LevelRolePrefix.Length..]}",
+        _ => roleKey,
+    };
 
     private static string RoleFlavorConfigKey(string roleKey)
         => $"flavor:booster:{roleKey}";
@@ -63,7 +56,7 @@ public sealed class BoosterService
     public async Task<Dictionary<string, string>> GetRoleLabelsAsync(ulong guildId)
     {
         var map = new Dictionary<string, string>();
-        foreach (var roleKey in SelectableRoleKeys)
+        foreach (var roleKey in await GetSelectableRoleKeysAsync(guildId))
             map[roleKey] = await GetRoleLabelAsync(guildId, roleKey);
         return map;
     }
@@ -78,7 +71,7 @@ public sealed class BoosterService
 
         var needle = userChoice.Trim();
 
-        foreach (var roleKey in SelectableRoleKeys)
+        foreach (var roleKey in await GetSelectableRoleKeysAsync(guildId))
         {
             var label = await GetRoleLabelAsync(guildId, roleKey);
 
@@ -94,7 +87,7 @@ public sealed class BoosterService
     public async Task<Dictionary<string, ulong?>> GetRoleMapAsync(ulong guildId)
     {
         var map = new Dictionary<string, ulong?>();
-        foreach (var roleKey in SelectableRoleKeys)
+        foreach (var roleKey in await GetSelectableRoleKeysAsync(guildId))
             map[roleKey] = await _guildConfig.GetRoleAsync(guildId, roleKey);
         return map;
     }

@@ -41,12 +41,9 @@ public sealed class FlavorCommand : ICommand
 
         var boosterKey = new SlashCommandOptionBuilder()
             .WithName("role")
-            .WithDescription("Welche Booster-Auswahl soll umbenannt werden")
+            .WithDescription("Key der Booster-Auswahl (z.B. Role_standard, Role_level_20, Role_booster)")
             .WithType(ApplicationCommandOptionType.String)
             .WithRequired(true);
-
-        foreach (var roleKey in BoosterService.SelectableRoleKeys)
-            boosterKey.AddChoice(BoosterService.GetDefaultRoleLabel(roleKey), roleKey);
 
         var booster = new SlashCommandOptionBuilder()
             .WithName("booster")
@@ -188,6 +185,12 @@ public sealed class FlavorCommand : ICommand
                     return;
                 }
 
+                if (!(await _booster.GetSelectableRoleKeysAsync(guildId)).Contains(roleKey))
+                {
+                    await cmd.RespondAsync($"Unbekannter Key `{roleKey}`.", ephemeral: true);
+                    return;
+                }
+
                 await _booster.SetRoleLabelAsync(guildId, roleKey, label);
                 await cmd.RespondAsync($"Booster-Flavor gespeichert: `{roleKey}` -> `{label}`", ephemeral: true);
                 return;
@@ -317,11 +320,8 @@ public sealed class FlavorCommand : ICommand
                 embed.AddField("Welcome Titel", TextAssetService.Summarize(welcome.EmbedTitle, 120));
                 embed.AddField("Welcome Main", TextAssetService.Summarize(welcome.MainAnnouncement, 120));
 
-                foreach (var roleKey in BoosterService.SelectableRoleKeys)
-                {
-                    var label = labels.GetValueOrDefault(roleKey, BoosterService.GetDefaultRoleLabel(roleKey));
+                foreach (var (roleKey, label) in labels.Take(18))
                     embed.AddField(roleKey, label, inline: true);
-                }
 
                 await cmd.RespondAsync(embed: embed.Build(), ephemeral: true);
                 return;
