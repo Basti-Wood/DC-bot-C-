@@ -1,11 +1,8 @@
 using DCBot.Core;
-using DCBot.Core.Database;
-using DCBot.Core.Database.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace DCBot.Services.Booster;
 
-/// <summary>Booster-Farb-Rollen + Rainbow-Persistenz (Port des booster-Moduls).</summary>
+/// <summary>Booster-Farb-Rollen (Port des booster-Moduls).</summary>
 public sealed class BoosterService
 {
     public const string StandardRoleKey = "Role_standard";
@@ -21,17 +18,10 @@ public sealed class BoosterService
         return keys;
     }
 
-    private readonly IDbContextFactory<BotDbContext> _dbFactory;
-    private readonly BotConfig _config;
     private readonly GuildConfigService _guildConfig;
 
-    public BoosterService(
-        IDbContextFactory<BotDbContext> dbFactory,
-        BotConfig config,
-        GuildConfigService guildConfig)
+    public BoosterService(GuildConfigService guildConfig)
     {
-        _dbFactory = dbFactory;
-        _config = config;
         _guildConfig = guildConfig;
     }
 
@@ -90,54 +80,5 @@ public sealed class BoosterService
         foreach (var roleKey in await GetSelectableRoleKeysAsync(guildId))
             map[roleKey] = await _guildConfig.GetRoleAsync(guildId, roleKey);
         return map;
-    }
-
-    public async Task SetRainbowActiveAsync(ulong guildId, ulong userId, bool active)
-    {
-        await using var db = await _dbFactory.CreateDbContextAsync();
-        var entry = await db.RainbowUsers.FirstOrDefaultAsync(r =>
-            r.BotId == _config.BotId && r.GuildId == guildId && r.UserId == userId);
-
-        if (entry is null)
-        {
-            db.RainbowUsers.Add(new RainbowUser
-            {
-                BotId = _config.BotId,
-                GuildId = guildId,
-                UserId = userId,
-                CurrentIndex = 0,
-                Active = active,
-                UpdatedAt = DateTime.UtcNow,
-            });
-        }
-        else
-        {
-            entry.Active = active;
-            entry.UpdatedAt = DateTime.UtcNow;
-        }
-
-        await db.SaveChangesAsync();
-    }
-
-    /// <summary>Aktive Rainbow-User, deren letztes Update ≥ 30 Minuten her ist.</summary>
-    public async Task<List<RainbowUser>> GetDueRainbowUsersAsync()
-    {
-        await using var db = await _dbFactory.CreateDbContextAsync();
-        var cutoff = DateTime.UtcNow.AddMinutes(-30);
-        return await db.RainbowUsers.AsNoTracking()
-            .Where(r => r.BotId == _config.BotId && r.Active && r.UpdatedAt <= cutoff)
-            .ToListAsync();
-    }
-
-    public async Task UpdateRainbowUserAsync(ulong guildId, ulong userId, int? newIndex)
-    {
-        await using var db = await _dbFactory.CreateDbContextAsync();
-        var entry = await db.RainbowUsers.FirstOrDefaultAsync(r =>
-            r.BotId == _config.BotId && r.GuildId == guildId && r.UserId == userId);
-        if (entry is null) return;
-
-        if (newIndex is { } idx) entry.CurrentIndex = idx;
-        entry.UpdatedAt = DateTime.UtcNow;
-        await db.SaveChangesAsync();
     }
 }
