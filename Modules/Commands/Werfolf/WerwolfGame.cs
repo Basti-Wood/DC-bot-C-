@@ -349,7 +349,7 @@ public sealed class WerwolfGame
             return;
         }
 
-        var wolves = Math.Min(WerewolfCount, Players.Count / 2);
+        var wolves = Math.Min(WerewolfCount, (Players.Count - 1) / 2);
         AssignRoles(wolves);
         await CreateWolfChannelAsync();
         await LockVoiceAsync();
@@ -475,6 +475,7 @@ public sealed class WerwolfGame
         Phase = GamePhase.Night;
         _night = new NightState { Round = round };
         _wolfVotes.Clear();
+        _wolfNightMessage = null;
 
         var aliveWolves = Players.Values.Count(p => p.Alive && p.Role.IsWerewolf);
         if (aliveWolves > 0 && _wolfChannel is not null)
@@ -707,6 +708,7 @@ public sealed class WerwolfGame
     {
         Phase = GamePhase.Day;
         _dayVotes.Clear();
+        _voteMessage = null;
 
         // Friendzone-Stummschaltungen aktivieren (Sprach-Mute, nur für Lebende)
         foreach (var p in Players.Values.Where(p => p.MutedForRound && p.Alive))
@@ -758,7 +760,7 @@ public sealed class WerwolfGame
         var tally = new Dictionary<ulong, int>();
         foreach (var (voterId, targetId) in _dayVotes)
         {
-            if (!Players.TryGetValue(voterId, out var voter)) continue;
+            if (!Players.TryGetValue(voterId, out var voter) || !voter.Alive) continue;
             tally[targetId] = tally.GetValueOrDefault(targetId) + voter.Role.VoteWeight;
         }
         return tally;
@@ -842,6 +844,14 @@ public sealed class WerwolfGame
         var player = GetPlayer(comp.User.Id);
         if (player is null) { await comp.FollowupAsync("Du bist nicht Teil dieses Spiels.", ephemeral: true); return; }
         await player.Role.OnButtonAsync(this, player, comp, "twin");
+    }
+
+    /// <summary>Nach einem Tod außerhalb der Phasenauflösung (z.B. Rache): Sieg prüfen, sonst ggf. Phase abschließen.</summary>
+    public async Task AfterExternalKillAsync()
+    {
+        if (await CheckWinAsync()) return;
+        if (Phase == GamePhase.Night) await TryResolveNightAsync();
+        else if (Phase == GamePhase.Day) await TryResolveDayAsync();
     }
 
     // ---------------------------------------------------------------- Host-Force / Ende

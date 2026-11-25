@@ -9,7 +9,6 @@ public class BotDbContext : DbContext
 
     public DbSet<UserLevel> UserLevels => Set<UserLevel>();
     public DbSet<GuildConfig> GuildConfigs => Set<GuildConfig>();
-    public DbSet<RainbowUser> RainbowUsers => Set<RainbowUser>();
     public DbSet<GalleryThread> GalleryThreads => Set<GalleryThread>();
     public DbSet<GalleryPost> GalleryPosts => Set<GalleryPost>();
 
@@ -26,13 +25,6 @@ public class BotDbContext : DbContext
         {
             e.ToTable("guild_configs");
             e.HasIndex(x => new { x.BotId, x.GuildId, x.Key }).IsUnique();
-        });
-
-        modelBuilder.Entity<RainbowUser>(e =>
-        {
-            e.ToTable("rainbow_users");
-            e.HasIndex(x => new { x.BotId, x.GuildId, x.UserId }).IsUnique();
-            e.HasIndex(x => new { x.BotId, x.Active });
         });
 
         modelBuilder.Entity<GalleryThread>(e =>

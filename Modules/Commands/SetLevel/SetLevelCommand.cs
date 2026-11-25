@@ -1,3 +1,4 @@
+using DCBot.Core;
 using DCBot.Services.Level;
 using Discord;
 using Discord.WebSocket;
@@ -13,11 +14,13 @@ public sealed class SetLevelCommand : ICommand
     public bool AllowAdmin => true;
 
     private readonly LevelRepository _repo;
+    private readonly GuildConfigService _guildConfig;
     private readonly ILogger<SetLevelCommand> _logger;
 
-    public SetLevelCommand(LevelRepository repo, ILogger<SetLevelCommand> logger)
+    public SetLevelCommand(LevelRepository repo, GuildConfigService guildConfig, ILogger<SetLevelCommand> logger)
     {
         _repo = repo;
+        _guildConfig = guildConfig;
         _logger = logger;
     }
 
@@ -50,6 +53,11 @@ public sealed class SetLevelCommand : ICommand
 
         var xp = XpMath.TotalXpForLevel(level);
         await _repo.SetXpAsync(guildId, target.Id, xp);
+        if (target is SocketGuildUser member)
+        {
+            try { await _guildConfig.ApplyLevelRoleAsync(member, level); }
+            catch (Exception ex) { _logger.LogWarning(ex, "setlevel: failed to apply level role for {User}", target.Id); }
+        }
 
         _logger.LogInformation("setlevel: {User} -> level {Level} ({Xp} XP) by {Admin}",
             target.Id, level, xp, cmd.User.Id);

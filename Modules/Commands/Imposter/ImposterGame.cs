@@ -63,6 +63,7 @@ public sealed class ImposterGame
     private readonly ImposterGameManager _manager;
     private readonly ILogger<ImposterGame> _logger;
     private IUserMessage? _gameMessage;
+    private readonly SemaphoreSlim _lock = new(1, 1);
 
     public ImposterGame(
         ImposterGameManager manager,
@@ -194,7 +195,18 @@ public sealed class ImposterGame
 
     public async Task HandleButtonAsync(SocketMessageComponent comp, string action, string? extra)
     {
-        if (IsFinished) return;
+        await _lock.WaitAsync();
+        try { await HandleButtonCoreAsync(comp, action, extra); }
+        finally { _lock.Release(); }
+    }
+
+    private async Task HandleButtonCoreAsync(SocketMessageComponent comp, string action, string? extra)
+    {
+        if (IsFinished)
+        {
+            if (action == "answer") await comp.RespondAsync("Das Spiel ist vorbei.", ephemeral: true);
+            return;
+        }
 
         switch (action)
         {
@@ -231,9 +243,21 @@ public sealed class ImposterGame
             return;
         }
 
-        if (IsVoting || IsFinished)
+        if (ImposterId is not null || IsVoting || IsFinished)
         {
             await comp.FollowupAsync("Das Spiel läuft bereits.", ephemeral: true);
+            return;
+        }
+
+        if (Players.Count >= 24)
+        {
+            await comp.FollowupAsync("Das Spiel ist voll (24 Spieler).", ephemeral: true);
+            return;
+        }
+
+        if (user.VoiceChannel?.Id != Voice.Id)
+        {
+            await comp.FollowupAsync($"Du musst im Sprachkanal {Voice.Mention} sein, um beizutreten.", ephemeral: true);
             return;
         }
 
@@ -262,6 +286,12 @@ public sealed class ImposterGame
         if (comp.User.Id != Host.Id)
         {
             await comp.FollowupAsync("Nur der Host kann das Spiel starten.", ephemeral: true);
+            return;
+        }
+
+        if (ImposterId is not null)
+        {
+            await comp.FollowupAsync("Das Spiel läuft bereits.", ephemeral: true);
             return;
         }
 
@@ -377,7 +407,8 @@ public sealed class ImposterGame
 
         if (IsVoting)
         {
-            await comp.FollowupAsync("Die Abstimmung läuft bereits.", ephemeral: true);
+            await ResolveVotingAsync();
+            await comp.FollowupAsync("Die Abstimmung wurde beendet.", ephemeral: true);
             return;
         }
 
@@ -415,6 +446,7 @@ public sealed class ImposterGame
             var label = player.DisplayName.Length > 20 ? player.DisplayName[..20] : player.DisplayName;
             cb.WithButton($"🗳️ {label}", ComponentId("vote", player.Id.ToString()), ButtonStyle.Secondary);
         }
+        cb.WithButton("🔚 Abstimmung beenden (Host)", ComponentId("endround"), ButtonStyle.Danger);
 
         var voteEmbed = new EmbedBuilder()
             .WithTitle("🗳️ Wer ist der Imposter?")
@@ -444,6 +476,12 @@ public sealed class ImposterGame
         if (!Players.ContainsKey(voter.Id))
         {
             await comp.FollowupAsync("Du bist kein Spieler in dieser Runde.", ephemeral: true);
+            return;
+        }
+
+        if (!IsVoting)
+        {
+            await comp.FollowupAsync("Gerade läuft keine Abstimmung.", ephemeral: true);
             return;
         }
 
@@ -571,19 +609,19 @@ public sealed class ImposterGame
     {
         if (comp.User is not SocketGuildUser user || !Players.ContainsKey(user.Id))
         {
-            await comp.FollowupAsync("Du bist kein Spieler in dieser Runde.", ephemeral: true);
+            await comp.RespondAsync("Du bist kein Spieler in dieser Runde.", ephemeral: true);
             return;
         }
 
         if (ImposterId is null)
         {
-            await comp.FollowupAsync("Das Spiel wurde noch nicht gestartet.", ephemeral: true);
+            await comp.RespondAsync("Das Spiel wurde noch nicht gestartet.", ephemeral: true);
             return;
         }
 
         if (IsVoting)
         {
-            await comp.FollowupAsync("Die Abstimmung läuft bereits — keine Antworten mehr möglich.", ephemeral: true);
+            await comp.RespondAsync("Die Abstimmung läuft bereits — keine Antworten mehr möglich.", ephemeral: true);
             return;
         }
 
@@ -594,7 +632,7 @@ public sealed class ImposterGame
             .WithTitle("Deine Antwort")
             .WithCustomId(ComponentId("modal"))
             .AddTextInput("Frage", "question_display", TextInputStyle.Paragraph,
-                placeholder: question, value: question, required: false)
+                value: question, required: false)
             .AddTextInput("Deine Antwort", "answer", TextInputStyle.Paragraph,
                 placeholder: "Schreib hier deine Antwort...", required: true, maxLength: 500);
 
@@ -603,6 +641,13 @@ public sealed class ImposterGame
 
     /// <summary>Wird vom ImposterEvent aufgerufen, wenn ein Modal abgeschickt wird.</summary>
     public async Task HandleModalAsync(SocketModal modal)
+    {
+        await _lock.WaitAsync();
+        try { await HandleModalCoreAsync(modal); }
+        finally { _lock.Release(); }
+    }
+
+    private async Task HandleModalCoreAsync(SocketModal modal)
     {
         if (modal.User is not SocketGuildUser user || !Players.ContainsKey(user.Id))
         {

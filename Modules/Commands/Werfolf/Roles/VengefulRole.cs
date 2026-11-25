@@ -59,6 +59,6 @@ public sealed class VengefulRole : Role
         });
         await game.SetWolfGhostAsync(self, allowRead: true);
         await game.KillAsync(target, $"wurde von {self.User.Mention} (Rachsüchtig) mit in den Tod gerissen 🗡️");
-        await game.CheckWinAsync();
+        await game.AfterExternalKillAsync();
     }
 }

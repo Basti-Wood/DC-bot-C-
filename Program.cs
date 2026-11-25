@@ -77,5 +77,6 @@ var host = builder.Build();
 
 // Ensure database schema exists (with retry while MariaDB boots up)
 await DatabaseInitializer.EnsureCreatedAsync(host.Services);
+await host.Services.GetRequiredService<GuildConfigService>().MigrateKeysAsync();
 
 await host.RunAsync();

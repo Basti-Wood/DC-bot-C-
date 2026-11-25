@@ -71,7 +71,11 @@ public sealed class MessageXpEvent : IEventListener
         var newLevel = XpMath.CalcLevel(after);
 
         if (newLevel > prevLevel)
+        {
             await AnnounceLevelUpAsync(channel.Guild, user, newLevel, message.Channel);
+            try { await _guildConfig.ApplyLevelRoleAsync(user, newLevel); }
+            catch (Exception ex) { _logger.LogWarning(ex, "Failed to apply level role for {User}", user.Id); }
+        }
     }
 
     private static long ClampToWindow(

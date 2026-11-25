@@ -14,7 +14,7 @@ public sealed class CupidRole : Role
     public override string AbilityText =>
         "Zu Spielbeginn verkuppelst du zwei Spieler. Stirbt einer von ihnen, stirbt der andere an Liebeskummer.";
 
-    private ulong? _first;
+    private ulong? _first, _second;
 
     public override async Task OnGameStartAsync(WerwolfGame game, Player self)
     {
@@ -59,21 +59,21 @@ public sealed class CupidRole : Role
             return;
         }
 
-        if (step != "b" || _first is null)
+        if (step == "b") _second = value; else _first = value;
+        if (_first is null || _second is null)
         {
-            _first = value;
-            await WerwolfGame.EditSourceMessageAsync(comp, m => m.Content = $"💘 Partner 1: {target.User.Mention}\nWähle jetzt Partner 2.");
+            await WerwolfGame.EditSourceMessageAsync(comp, m => m.Content = $"💘 Partner {(step == "b" ? 2 : 1)}: {target.User.Mention}\nWähle jetzt den anderen Partner.");
             return;
         }
 
-        if (_first == value)
+        if (_first == _second)
         {
             await comp.FollowupAsync("Bitte wähle zwei verschiedene Spieler.", ephemeral: true);
             return;
         }
 
         var a = game.Players[_first.Value];
-        var b = target;
+        var b = game.Players[_second.Value];
         a.Lover = b;
         b.Lover = a;
 

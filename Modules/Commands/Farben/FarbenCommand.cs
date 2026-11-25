@@ -7,7 +7,7 @@ namespace DCBot.Commands.Farben;
 
 /// <summary>
 /// /farben — Farb-Rolle für Booster (Port von farben_command.go).
-/// Braucht die "Booster_role"-Rolle. "Rainbow" aktiviert die Rotation.
+/// Braucht die "Role_booster"-Rolle.
 /// </summary>
 public sealed class FarbenCommand : ICommand
 {
@@ -28,7 +28,7 @@ public sealed class FarbenCommand : ICommand
     {
         var option = new SlashCommandOptionBuilder()
             .WithName("wahl")
-            .WithDescription("Rolle/Farbe oder 'Rainbow' (Name aus /flavor booster möglich)")
+            .WithDescription("Rolle/Farbe (Name aus /flavor booster möglich)")
             .WithType(ApplicationCommandOptionType.String)
             .WithRequired(true);
         return new List<SlashCommandOptionBuilder> { option };
@@ -67,16 +67,6 @@ public sealed class FarbenCommand : ICommand
             return;
         }
 
-        if (string.Equals(choice, "Rainbow", StringComparison.OrdinalIgnoreCase))
-        {
-            await _booster.SetRainbowActiveAsync(guild.Id, member.Id, true);
-            await RespondEmbedAsync(cmd, "Rainbow Modus",
-                "Rainbow Modus aktiviert! Deine Farbe ändert sich nun alle 30 Minuten. YAY", 0x2ecc71, member);
-            return;
-        }
-
-        await _booster.SetRainbowActiveAsync(guild.Id, member.Id, false);
-
         var selectedRoleKey = await _booster.ResolveRoleKeyByLabelAsync(guild.Id, choice);
         if (selectedRoleKey is null)
         {
@@ -96,7 +86,7 @@ public sealed class FarbenCommand : ICommand
         }
 
         // Alle anderen wählbaren Rollen entfernen, gewünschte hinzufügen
-        foreach (var roleKey in BoosterService.SelectableRoleKeys)
+        foreach (var roleKey in roleMap.Keys)
         {
             if (string.Equals(roleKey, selectedRoleKey, StringComparison.OrdinalIgnoreCase))
                 continue;
